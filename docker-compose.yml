@@ -1,0 +1,162 @@
+version: '3.7'
+
+networks:
+  webnet:
+    name: order-payment_backend-network
+
+volumes:
+  service-order-data:
+    name: order-payment_service-order-data
+  service-payment-data:
+    name: order-payment_service-payment-data
+  pgadmin:
+    name: order-payment_pgadmin-data
+
+services:
+
+  api-gateway:
+    container_name: order-app_api-gateway
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+      target: development
+      args:
+        NODE_ENV: development
+    image: "order-app/api-gateway:latest"
+    restart: unless-stopped
+    env_file: apps/api-gateway/.env
+    networks:
+      - webnet
+    volumes:
+      - .:/nest
+      - /nest/node_modules
+    depends_on:
+      - service-order
+      - service-payment
+    ports:
+      - ${API_GATEWAY_PORT}:3000
+
+  service-order:
+    container_name: order-app_service-order
+    build:
+      context: .
+      dockerfile: apps/service-order/Dockerfile
+      target: development
+      args:
+        NODE_ENV: development
+    image: "order-app/service-order:latest"
+    restart: unless-stopped
+    env_file: apps/service-order/.env
+    networks:
+      - webnet
+    volumes:
+      - .:/nest
+      - /nest/node_modules
+    depends_on:
+      - service-order-db
+
+  service-payment:
+    container_name: order-app_service-payment
+    build:
+      context: .
+      dockerfile: apps/service-payment/Dockerfile
+      target: development
+      args:
+        NODE_ENV: development
+    image: "order-app/service-payment:latest"
+    restart: unless-stopped
+    env_file: apps/service-payment/.env
+    networks:
+      - webnet
+    volumes:
+      - .:/nest
+      - /nest/node_modules
+    depends_on:
+      - service-payment-db
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  # Database #
+  service-order-db:
+    container_name: order-app_service-order-db
+    image: "bitnami/postgresql:14.0.0"
+    env_file: apps/service-order/.env
+    environment:
+      - POSTGRESQL_USERNAME=${DB_USERNAME:-postgres}
+      - POSTGRESQL_PASSWORD=${DB_PASSWORD:-123456}
+      - POSTGRESQL_DATABASE=${DB_DATABASE:-service_order_db}
+      - POSTGRESQL_POSTGRES_CONNECTION_LIMIT=20
+    restart: unless-stopped
+    volumes:
+      - service-order-data:/data/postgres/
+    networks:
+      - webnet
+
+  service-payment-db:
+    container_name: order-app_service-payment-db
+    image: "bitnami/postgresql:14.0.0"
+    env_file: apps/service-payment/.env
+    environment:
+      - POSTGRESQL_USERNAME=${DB_USERNAME:-postgres}
+      - POSTGRESQL_PASSWORD=${DB_PASSWORD:-123456}
+      - POSTGRESQL_DATABASE=${DB_DATABASE:-service_payment_db}
+      - POSTGRESQL_POSTGRES_CONNECTION_LIMIT=20
+    restart: unless-stopped
+    volumes:
+      - service-payment-data:/data/postgres/
+    networks:
+      - webnet
+
+  # Database #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  redis:
+    container_name: order-app_redis
+    image: redis:latest
+    restart: unless-stopped
+    # ports:
+    #   - "6379:6379"
+    networks:
+      - webnet
+
+
+  pgadmin:
+    container_name: order-app_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    networks:
+      - webnet
+    restart: unless-stopped
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"

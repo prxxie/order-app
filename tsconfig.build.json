@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["node_modules/bull/lib/commands/*.lua"],
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"],
+}
