@@ -1,0 +1,101 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v1.6
+
+    - name: Login Docker Hub
+      uses: docker/login-action@v2.0.0
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+        
+    - name: Docker Setup Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+      id: buildx
+    
+    - name: Cache
+      uses: actions/cache@v3.0.8
+      with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      
+    - name: Get api-gateway changes
+      id: api-gateway-changes
+      uses: tj-actions/changed-files@v28.0.0
+      with:
+          files: |
+            apps/api-gateway
+            libs
+            
+    - name: Get service-order changes
+      id: service-order-changes
+      uses: tj-actions/changed-files@v28.0.0
+      with:
+          files: |
+            apps/service-order
+            libs
+            
+    - name: Get service-payment changes
+      id: service-payment-changes
+      uses: tj-actions/changed-files@v28.0.0
+      with:
+          files: |
+            apps/service-payment
+            libs
+            
+    - name: Build and push api-gateway Docker image
+      uses: docker/build-push-action@v3.1.1
+      id: docker_build_api-gateway
+      if: steps.api-gateway-changes.outputs.any_changed == 'true'
+      with:
+          context: ./
+          file: ./apps/api-gateway/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/order-app/api-gateway
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          
+    - name: Build and push service-order Docker image
+      uses: docker/build-push-action@v3.1.1
+      id: docker_build_service-order
+      if: steps.service-order-changes.outputs.any_changed == 'true'
+      with:
+          context: ./
+          file: ./apps/service-order/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/order-app/service-order
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          
+    - name: Build and push service-payment Docker image
+      uses: docker/build-push-action@v3.1.1
+      id: docker_build_service-payment
+      if: steps.service-payment-changes.outputs.any_changed == 'true'
+      with:
+          context: ./
+          file: ./apps/service-payment/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/order-app/service-payment
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
