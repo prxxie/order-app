@@ -9,6 +9,8 @@ RUN yarn install
 
 COPY . .
 
+RUN yarn run build
+
 EXPOSE 3000
 
 CMD ["npm", "run", "start:debug", "service-order"]
@@ -20,7 +22,9 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /nest
 
-COPY --from=development /nest/node_modules ./node_modules
-COPY --from=development /nest/dist ./dist
+RUN yarn global add pm2
 
-CMD ["node", "dist/apps/service-order/main.js"]
+COPY --from=development /nest/node_modules ./node_modules
+COPY --from=development /nest/dist/apps/service-order/main.js .
+
+CMD ["pm2", "start", "main.js"]

@@ -64,6 +64,7 @@ jobs:
       if: steps.api-gateway-changes.outputs.any_changed == 'true'
       with:
           context: ./
+          target: production
           file: ./apps/api-gateway/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
@@ -77,6 +78,7 @@ jobs:
       if: steps.service-order-changes.outputs.any_changed == 'true'
       with:
           context: ./
+          target: production
           file: ./apps/service-order/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
@@ -90,6 +92,7 @@ jobs:
       if: steps.service-payment-changes.outputs.any_changed == 'true'
       with:
           context: ./
+          target: production
           file: ./apps/service-payment/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true

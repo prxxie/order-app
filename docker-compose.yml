@@ -2,7 +2,8 @@ version: '3.7'
 
 networks:
   webnet:
-    name: order-payment_backend-network
+    external:
+      name: mainnet
 
 volumes:
   service-order-data:
@@ -33,8 +34,8 @@ services:
     depends_on:
       - service-order
       - service-payment
-    ports:
-      - ${API_GATEWAY_PORT}:3000
+    # ports:
+    #   - ${API_GATEWAY_PORT}:3000
 
   service-order:
     container_name: order-app_service-order
@@ -153,10 +154,11 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
+      VIRTUAL_HOST: pgadmin.pb.local
     volumes:
       - pgadmin:/var/lib/pgadmin
     networks:
       - webnet
     restart: unless-stopped
-    ports:
-      - "${PGADMIN_PORT:-5050}:80"
+    # ports:
+    #   - "${PGADMIN_PORT:-5050}:80"
