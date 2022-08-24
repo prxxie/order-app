@@ -1,6 +1,7 @@
 FROM node:14 AS development
 
 WORKDIR /nest
+
 ENV NODE_ENV=development
 # RUN npm config set registry http://registry.npmjs.org/ --global
 
