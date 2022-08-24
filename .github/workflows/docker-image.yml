@@ -33,38 +33,26 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      
-    - name: Get api-gateway changes
-      id: api-gateway-changes
-      uses: tj-actions/changed-files@v28.0.0
+
+    - name: Filter
+      uses: dorny/paths-filter@v2
+      id: filter
       with:
-          since_last_remote_commit: "true"
-          files: |
-            apps/api-gateway
-            libs
-            
-    - name: Get service-order changes
-      id: service-order-changes
-      uses: tj-actions/changed-files@v28.0.0
-      with:
-          since_last_remote_commit: "true"
-          files: |
-            apps/service-order
-            libs
-            
-    - name: Get service-payment changes
-      id: service-payment-changes
-      uses: tj-actions/changed-files@v28.0.0
-      with:
-          since_last_remote_commit: "true"
-          files: |
-            apps/service-payment
-            libs
-            
+        filters: |
+          api-gateway:
+            - 'apps/api-gateway/**'
+            - 'libs/**'
+          service-order:
+            - 'apps/service-order/**'
+            - 'libs/**'
+          service-payment:
+            - 'apps/service-payment/**'
+            - 'libs/**'
+    
     - name: Build and push api-gateway Docker image
       uses: docker/build-push-action@v3.1.1
       id: docker_build_api-gateway
-      if: steps.api-gateway-changes.outputs.any_changed == 'true'
+      if: steps.filter.outputs.api-gateway == 'true'
       with:
           context: ./
           target: production
@@ -78,7 +66,7 @@ jobs:
     - name: Build and push service-order Docker image
       uses: docker/build-push-action@v3.1.1
       id: docker_build_service-order
-      if: steps.service-order-changes.outputs.any_changed == 'true'
+      if: steps.filter.outputs.service-order == 'true'
       with:
           context: ./
           target: production
@@ -92,7 +80,7 @@ jobs:
     - name: Build and push service-payment Docker image
       uses: docker/build-push-action@v3.1.1
       id: docker_build_service-payment
-      if: steps.service-payment-changes.outputs.any_changed == 'true'
+      if: steps.filter.outputs.service-payment == 'true'
       with:
           context: ./
           target: production
