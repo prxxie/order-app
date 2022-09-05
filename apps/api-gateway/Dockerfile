@@ -10,7 +10,7 @@ RUN yarn install
 
 COPY . .
 
-RUN yarn run build
+RUN yarn run build api-gateway
 
 EXPOSE 3000
 

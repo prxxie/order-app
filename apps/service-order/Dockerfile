@@ -10,7 +10,7 @@ RUN yarn install
 
 COPY . .
 
-RUN yarn run build
+RUN yarn run build service-order
 
 EXPOSE 3000
 
