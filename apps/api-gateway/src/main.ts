@@ -14,7 +14,7 @@ async function bootstrap() {
 
   /*** Swagger Setup */
   const config = new DocumentBuilder()
-    .setTitle('OrderPayment App Api')
+    .setTitle('OrderPayment Api documents')
     .setVersion('1.0')
     .build();
 
