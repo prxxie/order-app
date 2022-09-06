@@ -59,9 +59,9 @@ jobs:
           file: ./apps/api-gateway/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/order-app/api-gateway
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/order-app:api-gateway:latest
+          # cache-from: type=local,src=/tmp/.buildx-cache
+          # cache-to: type=local,dest=/tmp/.buildx-cache
           
     - name: Build and push service-order Docker image
       uses: docker/build-push-action@v3.1.1
@@ -73,9 +73,9 @@ jobs:
           file: ./apps/service-order/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/order-app/service-order
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/order-app:service-order:latest
+          # cache-from: type=local,src=/tmp/.buildx-cache
+          # cache-to: type=local,dest=/tmp/.buildx-cache
           
     - name: Build and push service-payment Docker image
       uses: docker/build-push-action@v3.1.1
@@ -87,6 +87,6 @@ jobs:
           file: ./apps/service-payment/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/order-app/service-payment
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/order-app:service-payment:latest
+          # cache-from: type=local,src=/tmp/.buildx-cache
+          # cache-to: type=local,dest=/tmp/.buildx-cache
