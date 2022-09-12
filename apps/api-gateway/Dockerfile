@@ -28,4 +28,4 @@ RUN yarn global add pm2
 COPY --from=development /nest/node_modules ./node_modules
 COPY --from=development /nest/dist/apps/api-gateway/main.js .
 
-CMD ["pm2", "start", "main.js"]
+CMD ["pm2-runtime", "main.js"]
