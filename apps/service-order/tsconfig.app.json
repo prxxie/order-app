@@ -4,6 +4,6 @@
     "declaration": false,
     "outDir": "../../dist/apps/service-order"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/migrations"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

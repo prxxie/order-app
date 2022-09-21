@@ -9,6 +9,8 @@ import { OrderService } from './services/order.service';
 import { OrderSubscriber } from './subscribers/order.subscriber';
 import { BullModule } from '@nestjs/bull';
 import { PaymentConsumer } from './consumers/payment.consumer';
+import { DatabaseService } from '@app/database';
+import { Migration20220815085155 } from './migrations/Migration20220815085155';
 
 const logger = new Logger('MikroORM');
 
@@ -20,11 +22,18 @@ const logger = new Logger('MikroORM');
       autoLoadEntities: true,
       debug: process.env.NODE_ENV === 'development',
       logger: logger.log.bind(logger),
-      // subscribers: [new OrderEntitySubscriber()],
       allowGlobalContext: true,
       pool: {
         min: 10,
         max: 20,
+      },
+      migrations: {
+        migrationsList: [
+          {
+            name: 'Migration20220815085155.ts',
+            class: Migration20220815085155,
+          },
+        ],
       },
     }),
     MikroOrmModule.forFeature([OrderEntity]),
@@ -39,6 +48,6 @@ const logger = new Logger('MikroORM');
     }),
   ],
   controllers: [OrderController],
-  providers: [OrderService, OrderSubscriber, PaymentConsumer],
+  providers: [OrderService, OrderSubscriber, PaymentConsumer, DatabaseService],
 })
 export class ServiceOrderModule {}

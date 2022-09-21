@@ -16,6 +16,10 @@ volumes:
 services:
 
   api-gateway:
+    # deploy:
+    #   replicas: 1
+    #   restart_policy:
+    #     condition: on-failure
     container_name: order-app_api-gateway
     build:
       context: .

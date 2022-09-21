@@ -20,7 +20,7 @@ const cliConfig = {
   highlighter: new SqlHighlighter(),
   metadataProvider: TsMorphMetadataProvider,
   migrations: {
-    path: 'dist/migrations',
+    path: 'migrations',
     pathTs: 'apps/service-order/src/migrations/',
   },
 };
